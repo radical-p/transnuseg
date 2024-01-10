@@ -46,6 +46,7 @@ class MyDataset(Dataset):
         normal_edge_mask = self.generate_normal_edge_mask(label)
         cluster_edge_mask = self.generate_cluster_edge_mask(label)
 
+        img = img / 255.0 if np.max(img) > 2 else img
 
         # Apply transformations
         if self.transform:
@@ -54,6 +55,10 @@ class MyDataset(Dataset):
             instance_mask, semantic_mask, normal_edge_mask, cluster_edge_mask = augmented['masks']
 
         # Convert to tensor
+
+        #instance_mask = instance_mask / 255.0 if np.max(instance_mask) > 2 else instance_mask
+
+
         img = ToTensorV2()(image=img)['image']
         instance_mask = torch.tensor(instance_mask, dtype=torch.float32)
         semantic_mask = torch.tensor(semantic_mask, dtype=torch.float32)
@@ -61,10 +66,19 @@ class MyDataset(Dataset):
         cluster_edge_mask = torch.tensor(cluster_edge_mask, dtype=torch.float32)
 
         # Send to device
+        #img = img / 255.0 if np.max(img) > 2 else img
         img = img.to(device)
+
+        #instance_mask = instance_mask / 255.0 if np.max(instance_mask) > 2 else instance_mask
         instance_mask = instance_mask.to(device)
+
+        #semantic_mask = semantic_mask / 255.0 if np.max(semantic_mask) > 2 else semantic_mask
         semantic_mask = semantic_mask.to(device)
+
+        #normal_edge_mask = normal_edge_mask / 255.0 if np.max(normal_edge_mask) > 2 else normal_edge_mask
         normal_edge_mask = normal_edge_mask.to(device)
+
+        #cluster_edge_mask = cluster_edge_mask / 255.0 if np.max(cluster_edge_mask) > 2 else cluster_edge_mask
         cluster_edge_mask = cluster_edge_mask.to(device)
 
         return img, instance_mask, semantic_mask, normal_edge_mask, cluster_edge_mask
